@@ -1,0 +1,3 @@
+<launch>
+    <node name="rosbag_to_xyz" pkg="matching_viewer" type="bag2xyz.py" output="screen" />
+</launch>

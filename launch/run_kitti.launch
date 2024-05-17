@@ -1,0 +1,3 @@
+<launch>
+    <node name="kitti_rosbag_to_csv" pkg="matching_viewer" type="kitti_bag2csv.py" output="screen" />
+</launch>
