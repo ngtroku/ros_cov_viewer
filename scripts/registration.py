@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 import numpy as np
 import pandas as pd
 import open3d as o3d
 import small_gicp
 import sys
 
-def random_sampling(array, sample_rate=0.5): # random sampling
+def random_sampling(array, sample_rate): # random sampling
 
     num_sample = int(array.shape[0] * sample_rate)
 
@@ -16,7 +18,7 @@ def random_sampling(array, sample_rate=0.5): # random sampling
 
     return sampled_array1, sampled_array2
 
-def points_noise(array, scale_translation=1):
+def points_noise(array, scale_translation):
     rng = np.random.default_rng()
 
     # x, y, z 軸方向の各点に正規分布からサンプリングされたノイズを定義
@@ -35,8 +37,8 @@ def points_noise(array, scale_translation=1):
 def calc_factor(source_points, target_points):
     # update : ヘッセ行列を直接使用(2024 5/8)
 
-    source, source_tree = small_gicp.preprocess_points(source_points, downsampling_resolution=0.5)
-    target, target_tree = small_gicp.preprocess_points(target_points, downsampling_resolution=0.5)
+    source, source_tree = small_gicp.preprocess_points(source_points, downsampling_resolution=0.3)
+    target, target_tree = small_gicp.preprocess_points(target_points, downsampling_resolution=0.3)
 
     result = small_gicp.align(target, source, target_tree)
     result = small_gicp.align(target, source, target_tree, result.T_target_source)
@@ -72,21 +74,21 @@ def calc_factor(source_points, target_points):
     
     return np.array(list_xyz), np.array(list_cov_eigen_value)
 
-def execute_gicp(array, num_iteration=2):
+def execute_gicp(array, num_iteration, sample_rate, scale_translation):
     counter = 1
-    pc1, pc2 = random_sampling(array)
+    pc1, pc2 = random_sampling(array, sample_rate)
 
     while counter <= int(num_iteration):
 
         if counter == 1:
             #print("iteration:{}/{}".format(counter, num_iteration))
-            source, target = pc1, points_noise(pc2)
+            source, target = pc1, points_noise(pc2, scale_translation)
             coordinate_origin, dot_eigen_value_origin = calc_factor(source, target)
             counter += 1
 
         else:
             #print("iteration:{}/{}".format(counter, num_iteration))
-            source, target = pc1, points_noise(pc2)
+            source, target = pc1, points_noise(pc2, scale_translation)
             coordinate, dot_eigen_value = calc_factor(source, target)
             coordinate_origin = np.concatenate([coordinate_origin, coordinate])
             dot_eigen_value_origin = np.concatenate([dot_eigen_value_origin, dot_eigen_value])

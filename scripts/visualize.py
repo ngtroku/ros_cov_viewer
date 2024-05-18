@@ -34,7 +34,7 @@ def count_eigen_score(angle_array, eigen_array, step):
     
     return list_angle, list_score
 
-def downsample_visualize(x, y, z, eigenvalue, rate=0.25):
+def downsample_visualize(x, y, z, eigenvalue, rate=0.1):
 
     num_sample = int(x.shape[0] * rate)
 
@@ -46,7 +46,7 @@ def downsample_visualize(x, y, z, eigenvalue, rate=0.25):
 
     return x_downsampled, y_downsampled, z_downsampled, eigenvalue_downsampled
 
-dir_name = "/home/rokuto/result_15153947"
+dir_name = "/home/rokuto/result_1852250"
 rosbag_speed_rate = 0.5
 FILES = sort_files(dir_name)
 

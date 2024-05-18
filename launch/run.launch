@@ -1,3 +1,9 @@
 <launch>
-    <node name="rosbag_to_xyz" pkg="matching_viewer" type="bag2xyz.py" output="screen" />
+    <!-- パラメータ設定セクション nodeとは独立させて書く-->
+    <param name="save_dir_name" value="/home/rokuto/"/>
+    <param name="subscribe_topic_name" value="/points_raw"/>
+    <param name="number_of_iterations" value="1"/>
+    <param name="sample_rate" value="0.5"/>
+    <param name="noise_variance" value="1"/>
+    <node name="rosbag_to_xyz" pkg="matching_viewer" type="bag2csv.py" output="screen" />
 </launch>

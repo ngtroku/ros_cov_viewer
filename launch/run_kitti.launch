@@ -1,3 +1,9 @@
 <launch>
-    <node name="kitti_rosbag_to_csv" pkg="matching_viewer" type="kitti_bag2csv.py" output="screen" />
+    <!-- パラメータ設定セクション nodeとは独立させて書く-->
+    <param name="save_dir_name" value="/home/rokuto/"/>
+    <param name="subscribe_topic_name" value="/points_raw"/>
+    <param name="number_of_iterations" value="1"/>
+    <param name="sample_rate" value="0.5"/>
+    <param name="noise_variance" value="1"/>
+    <node name="kitti_rosbag_to_csv" pkg="matching_viewer" type="kitti_bag2csv.py" output="screen"/>
 </launch>
