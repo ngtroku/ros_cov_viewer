@@ -31,6 +31,16 @@ def array2float(bin_array):
     float_array = np.apply_along_axis(binary2float, axis=1, arr = bin_array)
     return float_array
 
+def time_format(now_time, ref_time):
+    erapsed_raw = now_time - ref_time
+    # 小数点以下の桁数を揃える
+    erapsed_decimal_aligned = "{:.3f}".format(erapsed_raw)
+    # 小数点を取り除く
+    erapsed_decimal_removed = erapsed_decimal_aligned.replace('.', '')
+    # 桁数合わせ
+    erapsed_padded = erapsed_decimal_removed.rjust(8, '0')
+    return str(erapsed_padded)
+
 def write_csv(coordinate, eigen_score, save_dir, file_name):
     #start_evaluate = time.time()
     xyz = pd.DataFrame(coordinate, columns = ["x","y","z"])
@@ -90,11 +100,13 @@ class Node():
         coordinate, score = registration.execute_gicp(coordinate_array, num_iteration, sample_rate, scale_translation)
         now_timestamp = ros_now()
         # ここから結果をcsvに書き出し
-        
-        erapsed = str(round(now_timestamp - start, 6))
-        erapsed = erapsed.replace('.', '')
+
+        # ファイル名の小数点以下の桁数を合わせたい
+        erapsed = time_format(now_timestamp, start)
         file_name = erapsed + ".csv"
+        #file_name =str(start) + ".csv"
         write_csv(coordinate, score, save_dir, file_name)
+        #start += 1
         
 
 if __name__ == '__main__':

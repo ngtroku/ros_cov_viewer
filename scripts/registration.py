@@ -52,8 +52,9 @@ def calc_factor(source_points, target_points):
     sum_e = 0.0
     
     eigen_value, eigen_vector = np.linalg.eig(result.H)
-    global_max_value = np.argmax(eigen_value)
-    global_max_vector = eigen_vector[:, global_max_value] # 最も拘束が弱い方向
+    # 全体ヘッセの最小固有ベクトルを与える
+    global_min_value = np.argmin(eigen_value)
+    global_min_vector = eigen_vector[:, global_min_value] # 最も拘束が弱い方向
 
     list_xyz = []
     list_cov_eigen_value = []
@@ -62,11 +63,14 @@ def calc_factor(source_points, target_points):
         succ, H, b, e = factors[0].linearize(target, source, target_tree, result.T_target_source, i, rejector)
         if succ:
             point_eigen_value, point_eigen_vector = np.linalg.eig(H) #各点の固有値、固有ベクトルを求める
-            local_min_value = np.argmin(eigen_value) 
-            local_min_vector = point_eigen_vector[:, local_min_value] # 最も拘束が強い固有ベクトル
-            naiseki = np.dot(global_max_vector, local_min_vector)
+            # 各点ヘッセの最大固有ベクトルを与える
+            local_max_value = np.argmax(eigen_value) 
+            local_max_vector = point_eigen_vector[:, local_max_value] # 最も拘束が強い固有ベクトル
+            # local_min_vector[-1] = 0 # 高さ方向の成分を0に
+            
+            naiseki = np.dot(global_min_vector, local_max_vector)
             list_cov_eigen_value.append((naiseki.real + 1) / 2) # 値を0から1に範囲に制限
-            list_xyz.append(source_points[i])
+            list_xyz.append(source.points()[i, 0:3])
 
             sum_H += H
             sum_b += b

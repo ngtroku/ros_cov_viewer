@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
+
 import os, re
+import rospy
 import pandas as pd
 import numpy as np
 import matplotlib 
 import matplotlib.pyplot as plt
+
 
 def sort_files(dir_name):
     list_dir = os.listdir(dir_name)
@@ -34,7 +38,7 @@ def count_eigen_score(angle_array, eigen_array, step):
     
     return list_angle, list_score
 
-def downsample_visualize(x, y, z, eigenvalue, rate=0.1):
+def downsample_visualize(x, y, z, eigenvalue, rate=1.0):
 
     num_sample = int(x.shape[0] * rate)
 
@@ -46,23 +50,26 @@ def downsample_visualize(x, y, z, eigenvalue, rate=0.1):
 
     return x_downsampled, y_downsampled, z_downsampled, eigenvalue_downsampled
 
-dir_name = "/home/rokuto/result_1852250"
-rosbag_speed_rate = 0.5
+#dir_name = "/home/rokuto/result_219267"
+dir_name = rospy.get_param('directory_name', '/home')
+rosbag_speed_rate = float(rospy.get_param('rosbag_run_speed', 1.0))
 FILES = sort_files(dir_name)
 
 # set gigure
-fig = plt.figure(figsize=(9, 6))
+fig = plt.figure(figsize=(12, 6))
 plt.subplots_adjust(wspace=0.5)
 
-ax1 = fig.add_subplot(1, 2, 1, projection='3d')
+ax1 = fig.add_subplot(1, 3, 1)
 
-ax2 = fig.add_subplot(1, 2, 2)
+ax2 = fig.add_subplot(1, 3, 2)
+
+ax3 = fig.add_subplot(1, 3, 3)
 
 for file in FILES:
     ax1.cla() # initialize
     ax2.cla()
+    ax3.cla()
     path = dir_name + "/" + str(file)
-    t = int(file[:-4]) / (1e6 * (1 / rosbag_speed_rate))
     array_points, array_values = csv_2_array(path)
 
     # pre process to visualize
@@ -70,16 +77,23 @@ for file in FILES:
     list_angle, list_score = count_eigen_score(calc_angle(array_points), array_values, 10) # 角度情報, 重要度情報, 水平方位角範囲の広さ(deg)
 
     # visualize
-    ax1.scatter(x, y, z, c = eigen_value, s = 5, cmap = "jet")
+    ax1.scatter(y, x, c = eigen_value, cmap = "jet")
     ax1.set_xlabel("x (m)")
     ax1.set_ylabel("y (m)")
-    ax1.set_title("t={}".format(round(t, 3)))
+    ax1.set_title("bird eye plot")
 
-    ax2.plot(list_angle, list_score, marker="o")
+    ax2.hist(calc_angle(array_points), bins=15)
+    ax2.set_title("points histgram")
+    ax2.set_xticks([60 * i for i in range(7)])
     ax2.set_xlabel("angle (deg)")
-    ax2.set_ylabel("score")
-    ax2.set_title("t={}".format(round(t, 3)))
+    ax2.set_ylabel("# of points")
 
-    plt.pause(0.2)
+    ax3.plot(list_angle, list_score, marker="o")
+    ax3.set_xticks([60 * i for i in range(7)])
+    ax3.set_xlabel("angle (deg)")
+    ax3.set_ylabel("score")
+    ax3.set_title("score distribution")
+
+    plt.pause(0.1)
 
 plt.show()
