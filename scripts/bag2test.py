@@ -72,12 +72,12 @@ class Node():
         self.sub1 = rospy.Subscriber(rospy.get_param('subscribe_topic_name'), PointCloud2, self.subscriber_pointcloud) #subscriber
         
     def subscriber_pointcloud(self, msg):
-        iteration = int(len(msg.data)/18) 
+        iteration = int(len(msg.data)/22) 
 
         # block1
         #start_evaluate = time.time()
         hoge = np.frombuffer(msg.data, dtype=np.uint8)
-        fuga = hoge.reshape(iteration, 18)
+        fuga = hoge.reshape(iteration, 22)
         #print("block1 read_binary:{} sec".format(time.time() - start_evaluate))
 
         # block2 
@@ -142,5 +142,4 @@ if __name__ == '__main__':
 
     while not rospy.is_shutdown():
         rospy.sleep(0.001)
-
 
