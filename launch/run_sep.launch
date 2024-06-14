@@ -1,12 +1,12 @@
 <launch>
     <!-- パラメータ設定セクション nodeとは独立させて書く-->
     <param name="save_dir_name" value="/home/rokuto/"/>
-    <param name="subscribe_topic_name" value="/points_raw"/>
+    <param name="subscribe_topic_name" value="/velodyne_points"/>
     <param name="number_of_iterations" value="2"/>
     <param name="sample_rate" value="0.5"/>
     <param name="noise_variance" value="0.1"/>
-    <param name="min_distance" value="1"/>
-    <param name="max_distance" value="50"/>
-    <param name="max_height" value="-100"/>
-    <node name="rosbag_to_xyz" pkg="matching_viewer" type="kitti_bag2csv.py" output="screen" />
+    <param name="min_distance" value="2.5"/>
+    <param name="max_distance" value="20"/>
+    <param name="max_height" value="-1.3"/>
+    <node name="rosbag_to_xyz" pkg="matching_viewer" type="bag2test.py" output="screen" />
 </launch>
